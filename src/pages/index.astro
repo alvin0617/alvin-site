@@ -1,0 +1,84 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { SUBSTACK_URL } from '../config';
+
+const fmt = (d) => d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+const posts = (await getCollection('writing', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const latest = posts.slice(0, 5);
+---
+<Base>
+  <header class="hero">
+    <h1>Alvin<span class="stop">.</span></h1>
+    <p class="role">Founder of Cryptowesearch — crypto markets, AI infrastructure, and the capital flows underneath.</p>
+    <p class="place">Taipei · Shenzhen · Hong Kong</p>
+  </header>
+
+  <main>
+    <section class="block" id="myself">
+      <div class="block-index"><span class="num">01</span><span class="lbl">Myself</span></div>
+      <div class="prose">
+        <p>I write research on crypto and AI infrastructure &mdash; power, optical, memory, neocloud &mdash; in Traditional Chinese and English. I care less about the narrative and more about what capital flows and the supply chain are doing before the story catches up.</p>
+        <p>My conviction is simple: research frameworks can be applied fluidly across any market, and a nimble multi-agent workflow is what carries the thinking through to finished work. Reach me on <a class="inline" href="#">X</a> or by <a class="inline" href="mailto:you@example.com">email</a>.</p>
+      </div>
+    </section>
+
+    <section class="block" id="articles">
+      <div class="block-index"><span class="num">02</span><span class="lbl">Articles</span></div>
+      <div>
+        <ul class="list">
+          {latest.map((post) => (
+            <li>
+              <a class="item" href={`/writing/${post.id}`}>
+                <span class="t">{post.data.title}</span>
+                <span class="d">{fmt(post.data.date)}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <a class="viewall" href="/writing">All writing <span class="arr">&#8594;</span></a>
+      </div>
+    </section>
+
+    <section class="block" id="watching">
+      <div class="block-index"><span class="num">03</span><span class="lbl">Watching</span></div>
+      <div class="builds">
+        <div class="build">
+          <h3><span class="k" aria-hidden="true"></span>Markets &amp; macro <span class="zh">市場經濟</span></h3>
+          <p>Crypto market structure, capital flows, and the macro-to-crypto transmission chain.</p>
+        </div>
+        <div class="build">
+          <h3><span class="k" aria-hidden="true"></span>AI, applied <span class="zh">五行・命理</span></h3>
+          <p>Where AI actually ships &mdash; read through a five-element (五行/命理) lens for balance and timing.</p>
+        </div>
+        <div class="build">
+          <h3><span class="k" aria-hidden="true"></span>Sport &amp; the body <span class="zh">運動產業</span></h3>
+          <p>Volleyball, pickleball, climbing &mdash; and the economy being built around them.</p>
+        </div>
+        <div class="build">
+          <h3><span class="k" aria-hidden="true"></span>The attention economy <span class="zh">KOL・訊號</span></h3>
+          <p>How attention moves markets &mdash; tracking KOL signal, narrative velocity, and whether the calls actually correlate with price.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="block now" id="now">
+      <div class="block-index"><span class="num">04</span><span class="lbl">Now</span></div>
+      <div>
+        <p>Building an institutional knowledge system with Claude Code skills and rubrics. Tracking the memory drawdown and the software rotation. Running everything off a local Mac mini server so the research owns its own data.</p>
+        <p class="stamp">Updated Jul 2026</p>
+      </div>
+    </section>
+
+    <section class="block" id="newsletter">
+      <div class="block-index"><span class="num">05</span><span class="lbl">Newsletter</span></div>
+      <div>
+        <p class="sub-lead">The long-form research lives on the <span class="em">Cryptowesearch</span> Substack. Free to subscribe.</p>
+        <a class="cta" href={SUBSTACK_URL} target="_blank" rel="noopener">Subscribe on Substack <span class="arr">&#8599;</span></a>
+        <p class="sub-note">Weekly-ish. No paywall on the free tier.</p>
+      </div>
+    </section>
+  </main>
+</Base>

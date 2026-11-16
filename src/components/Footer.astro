@@ -1,0 +1,14 @@
+---
+import { SOCIAL } from '../config';
+---
+<footer>
+  <div class="flabel">Elsewhere</div>
+  <div class="flinks">
+    {SOCIAL.map((s) => (
+      <a href={s.url} target={s.url.startsWith('http') ? '_blank' : undefined} rel={s.url.startsWith('http') ? 'noopener' : undefined}>
+        {s.label} <span class="arr" aria-hidden="true">&#8599;</span>
+      </a>
+    ))}
+  </div>
+  <div class="copy">&copy; {new Date().getFullYear()} Alvin &mdash; built to be simple.</div>
+</footer>
