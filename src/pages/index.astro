@@ -19,14 +19,14 @@ let seed = 7;
 const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
 const stars = Array.from({ length: 70 }, () => ({ x: rnd() * 1000, y: rnd() * 600, r: 0.5 + rnd() * 1.1, o: 0.15 + rnd() * 0.45 }));
 
-const strip = (s) => s.replace(/[#*_`>\[\]]/g, '').replace(/\s+/g, ' ').trim();
+const strip = (s) => s.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/↗/g, '').replace(/[#*_`>\[\]]/g, '').replace(/\s+/g, ' ').trim();
 const branches = (slug) => [
   { key: 'writing', label: 'writing',
     items: writing.filter(has(slug)).slice(0, 3).map((p) => ({ text: p.data.title, href: postHref(p) })) },
   { key: 'work-with-me', label: 'work with me',
     items: work.filter(has(slug)).slice(0, 3).map((w) => ({ text: w.data.title, href: `/${slug}#work-with-me` })) },
   { key: 'updates', label: 'updates',
-    items: updates.filter(has(slug)).slice(0, 3).map((u) => ({ text: strip(u.body ?? '').slice(0, 40), href: `/${slug}#updates` })) },
+    items: updates.filter(has(slug)).slice(0, 3).map((u) => ({ text: strip(u.body ?? '').slice(0, 90), href: `/${slug}#updates` })) },
 ];
 ---
 <Base bare>
