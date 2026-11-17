@@ -31,12 +31,12 @@ Alvin 的五個領域剛好對應五行，而命理、玄學本來就是他的�
 |---|---|---|---|
 | 水 | 直覺、看不見的東西 | 玄學（個人興趣）| `water` |
 | 木 | 生長、從無到有 | Building／workflow（產品開發）| `wood` |
-| 火 | 傳播、表達 | AI／technology（知識與寫作）| `fire` |
+| 火 | 燃燒、享受 | Sports／pickleball（運動與品牌經營）| `fire` |
 | 土 | 身體、扎根 | Wellness／訓練（身心優化）| `earth` |
-| 金 | 紀律、競技、品牌 | Sports／pickleball（運動與品牌經營）| `metal` |
+| 金 | 趨勢、新機會 | AI／technology（知識與寫作）| `metal` |
 
 **相生順序**：木 → 火 → 土 → 金 → 水 → 木。
-這條順序也是網站要說的故事：做出東西（木）→ 寫成文章傳出去（火）→ 落回身體與生活（土）→ 用紀律和競技打磨（金）→ 回到直覺與看不見的東西（水）→ 又長出新的東西（木）。
+Alvin 已確認對應（2026-11-17，火與金對調）。五句短語：木 Connecting the dots／火 Burn, and enjoy it／土 好的精神與狀態／金 Keep up with the trend, explore new opportunities／水 Be liquid and well prepared。
 
 > 【需 Alvin 確認】五個領域與五行的對應。如果他想調整（例如金對應 AI），只需改資料檔，不影響程式。
 
