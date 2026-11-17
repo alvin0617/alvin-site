@@ -1,0 +1,7 @@
+[
+  { "slug": "wood",  "zh": "木", "en": "building", "domain": "Building / workflow", "tagline": "", "color": "#7fa88b" },
+  { "slug": "fire",  "zh": "火", "en": "ai",       "domain": "AI / technology",     "tagline": "", "color": "#c8553d" },
+  { "slug": "earth", "zh": "土", "en": "wellness", "domain": "Wellness / training", "tagline": "", "color": "#c9a15a" },
+  { "slug": "metal", "zh": "金", "en": "sports",   "domain": "Sports / pickleball", "tagline": "", "color": "#d4d6d9" },
+  { "slug": "water", "zh": "水", "en": "esoteric", "domain": "玄學",                 "tagline": "", "color": "#5f84a8" }
+]

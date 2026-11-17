@@ -285,3 +285,22 @@ footer .copy { margin-top: 44px; font-size: 13px; color: var(--faint); letter-sp
   .block-index .lbl { margin-top: 0; }
   .hero { padding: 60px 0 52px; }
 }
+
+/* ---------- v2: 五行內頁 ---------- */
+.empty { color: var(--muted); font-size: 15px; margin: 24px 0; }
+.el-head h1 { font-size: clamp(30px, 6vw, 56px); }
+.el-head .el-zh { color: var(--el); font-family: "Songti TC", "Noto Serif TC", "Source Han Serif TC", serif; margin-right: .2em; }
+.el-head .backlink { margin: 0 0 24px; }
+.el-links { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 14px; }
+.el-links a:hover { color: var(--accent-ink); }
+.update { padding: 22px 0; border-top: 1px solid var(--rule); }
+.update:first-child { border-top: none; }
+.update-date { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.update-body p { margin: 8px 0 0; }
+.workitem { padding: 26px 0; border-top: 1px solid var(--rule); }
+.workitem:first-child { border-top: none; }
+.workitem h3 { margin: 0 0 8px; font-size: 20px; }
+.workitem h3 .zh { color: var(--muted); font-weight: 400; font-size: 14px; }
+.workitem p { margin: 0 0 14px; color: var(--muted); max-width: 60ch; }
+.sheng-nav { display: flex; justify-content: space-between; gap: 20px; padding: 40px 0; border-top: 1px solid var(--rule); font-size: 14px; color: var(--muted); }
+.sheng-nav a:hover { color: var(--accent-ink); }

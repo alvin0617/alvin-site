@@ -14,7 +14,7 @@ const { post } = Astro.props;
 const { Content } = await render(post);
 const fmtLong = (d) => d.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
 ---
-<Base title={`${post.data.title} — Alvin`} description={post.data.description}>
+<Base title={`${post.data.title} — Alvin`} description={post.data.summary}>
   <article class="article">
     <a class="backlink" href="/writing"><span class="arr">&#8592;</span> All writing</a>
     <div class="article-head">
@@ -22,7 +22,9 @@ const fmtLong = (d) => d.toLocaleDateString('en-US', { day: 'numeric', month: 'l
       <p class="meta">{fmtLong(post.data.date)}</p>
     </div>
     <div class="article-body">
+      {post.data.summary && post.data.externalUrl && <p>{post.data.summary}</p>}
       <Content />
+      {post.data.externalUrl && <p><a class="inline" href={post.data.externalUrl} target="_blank" rel="noopener">閱讀原文 &#8599;</a></p>}
     </div>
     <a class="backlink" href="/writing"><span class="arr">&#8592;</span> All writing</a>
   </article>

@@ -1,0 +1,39 @@
+---
+import Base from '../layouts/Base.astro';
+import Lists from '../components/Lists.astro';
+import { ELEMENTS, SHENG, bySlug, loadAll, has } from '../lib/content';
+
+export function getStaticPaths() {
+  return ELEMENTS.map((el) => ({ params: { element: el.slug }, props: { el } }));
+}
+const { el } = Astro.props;
+const { writing, updates, work } = await loadAll();
+const i = SHENG.indexOf(el.slug);
+const prev = bySlug(SHENG[(i + 4) % 5]);
+const next = bySlug(SHENG[(i + 1) % 5]);
+---
+<Base title={`${el.zh} ${el.domain} — Alvin`} description={`${el.domain}：writing、work with me、updates。`}>
+  <div class="page-head el-head" style={`--el:${el.color}`}>
+    <a class="backlink" href={`/?el=${el.slug}`}><span class="arr">&#8592;</span> 星盤</a>
+    <h1><span class="el-zh">{el.zh}</span> {el.domain}</h1>
+    {el.tagline && <p>{el.tagline}</p>}
+  </div>
+  <main>
+    <section class="block" id="writing">
+      <div class="block-index"><span class="lbl">Writing</span></div>
+      <div><Lists kind="writing" items={writing.filter(has(el.slug))} showTags={false} /></div>
+    </section>
+    <section class="block" id="work-with-me">
+      <div class="block-index"><span class="lbl">Work with me</span></div>
+      <div><Lists kind="work" items={work.filter(has(el.slug))} showTags={false} /></div>
+    </section>
+    <section class="block" id="updates">
+      <div class="block-index"><span class="lbl">Updates</span></div>
+      <div><Lists kind="updates" items={updates.filter(has(el.slug))} showTags={false} /></div>
+    </section>
+    <nav class="sheng-nav" aria-label="相生">
+      <a href={`/${prev.slug}`}>&#8592; {prev.zh} {prev.domain}</a>
+      <a href={`/${next.slug}`}>{next.zh} {next.domain} &#8594;</a>
+    </nav>
+  </main>
+</Base>

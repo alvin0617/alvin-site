@@ -1,0 +1,35 @@
+---
+// 三條支線的清單：writing / updates / work。內頁共用。
+import { render } from 'astro:content';
+import { postHref, fmt, fmtDay, bySlug } from '../lib/content';
+const { kind, items, showTags = true } = Astro.props;
+const rendered = kind === 'updates'
+  ? await Promise.all(items.map(async (u) => ({ u, C: (await render(u)).Content })))
+  : [];
+---
+{items.length === 0 && <p class="empty">（尚無內容）</p>}
+{kind === 'writing' && items.length > 0 && (
+  <ul class="list">
+    {items.map((p) => (
+      <li>
+        <a class="item" href={postHref(p)} target={p.data.externalUrl ? '_blank' : undefined} rel={p.data.externalUrl ? 'noopener' : undefined}>
+          <span class="t">{p.data.title}{p.data.externalUrl && <span class="arr"> &#8599;</span>}</span>
+          <span class="d">{showTags && p.data.elements.map((e) => bySlug(e).zh).join(' ')} {fmt(p.data.date)}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+)}
+{kind === 'updates' && rendered.map(({ u, C }) => (
+  <div class="update">
+    <div class="update-date">{fmtDay(u.data.date)}{showTags && <span> · {u.data.elements.map((e) => bySlug(e).zh).join(' ')}</span>}</div>
+    <div class="update-body"><C /></div>
+  </div>
+))}
+{kind === 'work' && items.map((w) => (
+  <div class="workitem">
+    <h3>{w.data.title}{showTags && <span class="zh"> {w.data.elements.map((e) => bySlug(e).zh).join(' ')}</span>}</h3>
+    <p>{w.data.description}</p>
+    <a class="cta" href={w.data.cta.href}>{w.data.cta.label} <span class="arr">&#8594;</span></a>
+  </div>
+))}
