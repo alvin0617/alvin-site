@@ -33,7 +33,7 @@ Alvin 的五個領域剛好對應五行，而命理、玄學本來就是他的�
 | 木 | 生長、從無到有 | Building／workflow（產品開發）| `wood` |
 | 火 | 燃燒、享受 | Sports／pickleball（運動與品牌經營）| `fire` |
 | 土 | 身體、扎根 | Wellness／訓練（身心優化）| `earth` |
-| 金 | 趨勢、新機會 | AI／technology（知識與寫作）| `metal` |
+| 金 | 趨勢、新機會 | AI／Tech（知識與寫作）| `metal` |
 
 **相生順序**：木 → 火 → 土 → 金 → 水 → 木。
 Alvin 已確認對應（2026-11-17，火與金對調）。五句短語：木 Connecting the dots／火 Burn, and enjoy it／土 Sound mind, solid form／金 Keep up with the trend, explore new opportunities／水 Be liquid and well prepared。

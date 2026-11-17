@@ -7,7 +7,7 @@ const rendered = kind === 'updates'
   ? await Promise.all(items.map(async (u) => ({ u, C: (await render(u)).Content })))
   : [];
 ---
-{items.length === 0 && <p class="empty">（尚無內容）</p>}
+{items.length === 0 && <p class="empty">brewing ...</p>}
 {kind === 'writing' && items.length > 0 && (
   <ul class="list">
     {items.map((p) => (
@@ -30,6 +30,6 @@ const rendered = kind === 'updates'
   <div class="workitem">
     <h3>{w.data.title}{showTags && <span class="zh"> {w.data.elements.map((e) => bySlug(e).zh).join(' ')}</span>}</h3>
     <p>{w.data.description}</p>
-    <a class="cta" href={w.data.cta.href}>{w.data.cta.label} <span class="arr">&#8594;</span></a>
+    <a class="cta" href={w.data.cta.href} target={w.data.cta.href.startsWith('http') ? '_blank' : undefined} rel={w.data.cta.href.startsWith('http') ? 'noopener' : undefined}>{w.data.cta.label} <span class="arr">&#8594;</span></a>
   </div>
 ))}

@@ -4,7 +4,7 @@ import Lists from '../components/Lists.astro';
 import { ELEMENTS, loadAll } from '../lib/content';
 const { work } = await loadAll();
 ---
-<Base title="Work with me — Alvin" description="和 Alvin 合作的方式。">
+<Base title="Work with me · Alvin" description="和 Alvin 合作的方式。">
   <div class="page-head">
     <h1>Work with me<span class="stop">.</span></h1>
     <p class="el-links">{ELEMENTS.map((e) => <a href={`/${e.slug}#work-with-me`}>{e.zh} {e.domain}</a>)}</p>

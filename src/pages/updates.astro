@@ -4,7 +4,7 @@ import Lists from '../components/Lists.astro';
 import { ELEMENTS, loadAll } from '../lib/content';
 const { updates } = await loadAll();
 ---
-<Base title="Updates — Alvin" description="Alvin 的近況。">
+<Base title="Updates · Alvin" description="Alvin 的近況。">
   <div class="page-head">
     <h1>Updates<span class="stop">.</span></h1>
     <p class="el-links">{ELEMENTS.map((e) => <a href={`/${e.slug}#updates`}>{e.zh} {e.domain}</a>)}</p>

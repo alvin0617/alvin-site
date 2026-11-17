@@ -20,14 +20,32 @@ const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
 const stars = Array.from({ length: 70 }, () => ({ x: rnd() * 1000, y: rnd() * 600, r: 0.5 + rnd() * 1.1, o: 0.15 + rnd() * 0.45 }));
 
 const strip = (s) => s.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/↗/g, '').replace(/[#*_`>\[\]]/g, '').replace(/\s+/g, ' ').trim();
-const branches = (slug) => [
-  { key: 'writing', label: 'writing',
-    items: writing.filter(has(slug)).slice(0, 3).map((p) => ({ text: p.data.title, href: postHref(p) })) },
-  { key: 'work-with-me', label: 'work with me',
-    items: work.filter(has(slug)).slice(0, 3).map((w) => ({ text: w.data.title, href: `/${slug}#work-with-me` })) },
-  { key: 'updates', label: 'updates',
-    items: updates.filter(has(slug)).slice(0, 3).map((u) => ({ text: strip(u.body ?? '').slice(0, 90), href: `/${slug}#updates` })) },
-];
+// 近況內文有外部連結時，星盤上直接連過去
+const firstLink = (s) => s.match(/\]\((https?:\/\/[^)]+)\)/)?.[1];
+const ext = (href) => !!href && href.startsWith('http');
+const monthKey = (d) => d.toISOString().slice(0, 7);
+const monthLabel = (d) => d.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+// 依月份分組成時間軸的站點（新到舊）
+const byMonth = (items) => {
+  const out = [];
+  for (const it of items) {
+    const k = monthKey(it.date);
+    let g = out.find((x) => x.key === k);
+    if (!g) out.push((g = { key: k, label: monthLabel(it.date), items: [] }));
+    g.items.push(it);
+  }
+  return out;
+};
+const branches = (slug) => {
+  const w = writing.filter(has(slug)).map((p) => ({ text: p.data.title, href: postHref(p), date: p.data.date }));
+  const u = updates.filter(has(slug)).map((x) => ({ text: strip(x.body ?? ''), href: firstLink(x.body ?? ''), date: x.data.date }));
+  const k = work.filter(has(slug)).map((x) => ({ text: x.data.title, desc: x.data.description, href: x.data.cta.href, cta: x.data.cta.label }));
+  return [
+    { key: 'writing', label: 'writing', items: w, stations: byMonth(w) },
+    { key: 'work-with-me', label: 'work with me', items: k, stations: k.map((it, i) => ({ key: String(i), label: it.text, items: [it] })), work: true },
+    { key: 'updates', label: 'updates', items: u, stations: byMonth(u) },
+  ];
+};
 ---
 <Base bare>
   <div class="home">
@@ -44,6 +62,7 @@ const branches = (slug) => [
     <!-- 桌機：星盤 -->
     <div class="stage-wrap">
       <div class="stage" id="stage">
+        <div class="map" id="map">
         <svg viewBox="0 0 1000 600" role="img" aria-label="五行星盤：木、火、土、金、水">
           <defs>
             <filter id="rough" x="-20%" y="-20%" width="140%" height="140%">
@@ -105,18 +124,46 @@ const branches = (slug) => [
         {els.map((el) => (
           <div class="panels" data-el={el.slug} style={`--el:${el.color}`} hidden>
             {branches(el.slug).map((b) => (
-              <div class={`panel p-${b.key}`}>
-                <a class="p-label" href={`/${el.slug}#${b.key}`}>{b.label}</a>
-                {b.items.length > 0
-                  ? <ul>{b.items.map((it) => <li><a href={it.href}>{it.text}</a></li>)}</ul>
-                  : <p class="p-empty">（尚無內容）</p>}
-                <a class="p-more" href={`/${el.slug}#${b.key}`}>keep going &#8594;</a>
+              <div class={`panel p-${b.key}`} data-key={b.key}>
+                <div class="p-row">
+                  <a class="p-label" href={`/${el.slug}#${b.key}`} data-toggle aria-expanded="false">{b.label}</a>
+                  {b.items.length > 0 && (
+                    <div class="twig">
+                      {b.stations.map((g, gi) => (
+                        <div class="st" style={`--i:${gi}`}>
+                          <span class="st-head"><i class="dot" aria-hidden="true"></i>{g.label}</span>
+                          <ul class={b.work ? 'st-items st-work' : 'st-items'}>
+                            {g.items.map((it) => b.work
+                              ? <li><span class="p-desc">{it.desc}</span><a class="st-cta" href={it.href} target={ext(it.href) ? '_blank' : undefined} rel={ext(it.href) ? 'noopener' : undefined}>{it.cta} &#8599;</a></li>
+                              : <li>{it.href
+                                  ? <a href={it.href} target={ext(it.href) ? '_blank' : undefined} rel={ext(it.href) ? 'noopener' : undefined} title={it.text}>{it.text}</a>
+                                  : <span title={it.text}>{it.text}</span>}</li>)}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div class="p-preview">
+                  {b.items.length > 0
+                    ? <ul>{b.items.slice(0, 3).map((it) => (
+                        <li class={b.work ? 'p-work' : undefined}>
+                          {it.href
+                            ? <a href={it.href} target={ext(it.href) ? '_blank' : undefined} rel={ext(it.href) ? 'noopener' : undefined} title={it.text}>{it.text}</a>
+                            : <span title={it.text}>{it.text}</span>}
+                          {b.work && <span class="p-desc">{it.desc}</span>}
+                        </li>))}</ul>
+                    : <p class="p-empty">brewing ...</p>}
+                </div>
+                {b.items.length > 0 && <button type="button" class="p-more" data-toggle>keep going &#8594;</button>}
               </div>
             ))}
           </div>
         ))}
+        </div>
 
-        <a class="back" id="back" href="/" hidden aria-label="回到星盤">&#8592; 星盤</a>
+        <p class="pan-hint" id="panHint" hidden>drag to explore &#8594;</p>
+        <a class="back" id="back" href="/" hidden aria-label="回到星盤（Esc）">&#8592; 星盤 <kbd>esc</kbd></a>
       </div>
     </div>
 
@@ -144,7 +191,6 @@ const branches = (slug) => [
       <p class="index-foot">
         <a href={SUBSTACK_URL} target="_blank" rel="noopener">Cryptowesearch Substack &#8599;</a>
         <a href="/rss.xml">RSS</a>
-        <a href="/classic">classic</a>
       </p>
     </section>
   </div>
@@ -209,6 +255,7 @@ const branches = (slug) => [
         var slug = i >= 0 ? nodes[i].getAttribute('data-el') : null;
         panels.forEach(function (p) { p.hidden = p.getAttribute('data-el') !== slug; });
         back.hidden = i < 0;
+        collapseAll();
         if (i >= 0) {
           stage.style.setProperty('--el', nodes[i].style.getPropertyValue('--el'));
           // 重新觸發支線生長動畫
@@ -235,6 +282,85 @@ const branches = (slug) => [
           if (i !== selected) select(i, true);
         });
       });
+      // ── 枝條展開（可同時展開多條）＋ 地圖平移 ──────────────────
+      var map = document.getElementById('map');
+      var wrap = stage.parentElement;
+      var hint = document.getElementById('panHint');
+      var pan = 0, minPan = 0;
+
+      function setPan(x) {
+        pan = Math.max(minPan, Math.min(0, x));
+        map.style.transform = pan ? 'translateX(' + pan.toFixed(1) + 'px)' : '';
+        hint.hidden = !(minPan < 0 && pan > minPan + 4);
+      }
+      function measure() {
+        // 地圖最右緣超出視窗多少，就允許往左拖多少
+        var right = 0;
+        stage.querySelectorAll('.panels:not([hidden]) .panel.expanded').forEach(function (p) {
+          right = Math.max(right, p.getBoundingClientRect().right - pan);
+        });
+        var limit = wrap.getBoundingClientRect().right - 48;
+        minPan = right > limit ? limit - right : 0;
+        stage.classList.toggle('pannable', minPan < 0);
+        setPan(pan);
+      }
+      function toggle(panel, open) {
+        if (open === undefined) open = !panel.classList.contains('expanded');
+        panel.classList.toggle('expanded', open);
+        panel.querySelectorAll('[data-toggle]').forEach(function (t) {
+          if (t.classList.contains('p-more')) t.innerHTML = open ? '&#8592; fold' : 'keep going &#8594;';
+          else t.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+        measure();
+        // 展開動畫跑完、文字寬度確定後再量一次
+        setTimeout(measure, 900);
+      }
+      function collapseAll() {
+        stage.querySelectorAll('.panel.expanded').forEach(function (p) { toggle(p, false); });
+        minPan = 0; setPan(0);
+      }
+      stage.querySelectorAll('[data-toggle]').forEach(function (t) {
+        t.addEventListener('click', function (e) {
+          if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+          var panel = t.closest('.panel');
+          if (!panel.querySelector('.twig')) return; // 沒有內容的支線就照一般連結
+          e.preventDefault();
+          toggle(panel);
+        });
+      });
+
+      // 拖曳平移（點在連結或按鈕上不算拖曳）
+      var drag = null;
+      stage.addEventListener('pointerdown', function (e) {
+        if (minPan >= 0 || e.button !== 0 || e.target.closest('a, button')) return;
+        drag = { x: e.clientX, start: pan, moved: false };
+        stage.setPointerCapture(e.pointerId);
+        stage.classList.add('dragging');
+      });
+      stage.addEventListener('pointermove', function (e) {
+        if (!drag) return;
+        var dx = e.clientX - drag.x;
+        if (Math.abs(dx) > 3) drag.moved = true;
+        setPan(drag.start + dx);
+      });
+      function endDrag() { drag = null; stage.classList.remove('dragging'); }
+      stage.addEventListener('pointerup', endDrag);
+      stage.addEventListener('pointercancel', endDrag);
+      // 觸控板／滑鼠滾輪也能平移
+      stage.addEventListener('wheel', function (e) {
+        if (minPan >= 0 || selected < 0) return;
+        var d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+        if (!d) return;
+        e.preventDefault();
+        setPan(pan - d);
+      }, { passive: false });
+      document.addEventListener('keydown', function (e) {
+        if (minPan >= 0 || selected < 0 || e.target.closest('input, textarea')) return;
+        if (e.key === 'ArrowRight') { setPan(pan - 160); e.preventDefault(); }
+        if (e.key === 'ArrowLeft') { setPan(pan + 160); e.preventDefault(); }
+      });
+      window.addEventListener('resize', measure);
+
       back.addEventListener('click', function (e) { e.preventDefault(); select(-1, true); });
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && selected >= 0) select(-1, true); });
       window.addEventListener('popstate', fromUrl);
@@ -296,8 +422,40 @@ const branches = (slug) => [
   .stage.open .branches.grow path:nth-child(3) { animation-delay: .24s; }
   @keyframes grow { to { stroke-dashoffset: 0; } }
 
+  .map { position: absolute; inset: 0; transition: transform .35s cubic-bezier(.2,.7,.2,1); will-change: transform; }
+  .stage.dragging .map { transition: none; }
+  .stage.pannable { cursor: grab; }
+  .stage.dragging { cursor: grabbing; user-select: none; }
+  .stage-wrap { overflow: hidden; }
+
   .panels[hidden] { display: none; }
   .panel { position: absolute; left: 51.5%; width: 44%; transform: translateY(-50%); font-size: clamp(12px, 1.45cqw, 16px); animation: rise .7s ease-out both; animation-delay: .7s; }
+  .panel.expanded { width: max-content; }
+  .p-row { display: flex; align-items: flex-start; gap: 1.4em; }
+  .p-label { cursor: pointer; flex: none; }
+  .panel.expanded .p-preview { display: none; }
+
+  /* 枝條：從標籤往右長，每個月份是一個站點 */
+  .twig { display: none; position: relative; gap: 2.4em; padding-left: .4em; }
+  .panel.expanded .twig { display: flex; }
+  .twig::before { content: ""; position: absolute; left: -1em; right: -1.2em; top: .85em; height: 1px; background: var(--el); opacity: .7; transform-origin: left; animation: twig .8s ease-out both; }
+  @keyframes twig { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  .st { position: relative; animation: rise .5s ease-out both; animation-delay: calc(.25s + var(--i) * .12s); }
+  .st-head { display: inline-flex; align-items: center; gap: .5em; font-size: .85em; letter-spacing: .04em; color: var(--ink); background: var(--night); padding-right: .5em; line-height: 2; }
+  .st-head .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--el); box-shadow: 0 0 0 3px var(--night); }
+  .st-items { list-style: none; margin: .35em 0 0; padding: 0 0 0 .9em; border-left: 1px dashed color-mix(in srgb, var(--el) 45%, transparent);
+    display: grid; grid-template-rows: repeat(4, auto); grid-auto-flow: column; column-gap: 1.8em; }
+  .st-items li { margin: .2em 0; max-width: 30em; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .st-items a:hover, .st-items a:focus-visible { color: var(--ink); }
+  .st-work li { white-space: normal; max-width: 18em; }
+  .st-cta { display: inline-block; margin-top: .3em; color: var(--el); }
+  .p-desc { display: block; color: var(--dim); font-size: .9em; white-space: normal; }
+  .panel li.p-work { white-space: normal; }
+  .panel li.p-work > a { color: var(--ink); }
+  button.p-more { background: none; border: 0; padding: 0; font: inherit; cursor: pointer; }
+
+  .pan-hint { position: absolute; right: 3%; bottom: 3%; margin: 0; font-size: 13px; color: var(--dim); letter-spacing: .04em; animation: rise .5s ease-out both; }
+  .pan-hint[hidden] { display: none; }
   .panel.p-writing { top: 20.3%; }
   .panel.p-work-with-me { top: 50%; animation-delay: .82s; }
   .panel.p-updates { top: 79.7%; animation-delay: .94s; }
@@ -312,6 +470,7 @@ const branches = (slug) => [
 
   .back { position: absolute; left: 3%; bottom: 3%; font-size: 14px; color: var(--dim); border: 1px solid var(--dim); border-radius: 999px; padding: 5px 14px; }
   .back[hidden] { display: none; }
+  .back kbd { font: inherit; font-size: 11px; letter-spacing: .06em; margin-left: 6px; padding: 0 5px; border: 1px solid currentColor; border-radius: 3px; opacity: .7; }
   .back:hover, .back:focus-visible { color: var(--ink); border-color: var(--ink); }
   .home a:focus-visible { outline: 1px dashed var(--ink); outline-offset: 4px; }
 
@@ -331,7 +490,8 @@ const branches = (slug) => [
   .index-foot { display: flex; gap: 20px; margin: 28px 0 0; font-size: 13px; color: var(--dim); }
 
   @media (prefers-reduced-motion: reduce) {
-    .sheng line, .panel, .stage.open .branches.grow path { animation: none; }
+    .sheng line, .panel, .st, .twig::before, .stage.open .branches.grow path { animation: none; }
+    .map { transition: none; }
     .stage.open .branches.grow path { stroke-dashoffset: 0; }
   }
 </style>

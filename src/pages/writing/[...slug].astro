@@ -1,6 +1,8 @@
 ---
+// 文章頁：深色星空，但配色比首頁更冷、更安靜，讓讀者專注在文字上。
 import Base from '../../layouts/Base.astro';
 import { getCollection, render } from 'astro:content';
+import { bySlug } from '../../lib/content';
 
 export async function getStaticPaths() {
   const posts = await getCollection('writing', ({ data }) => !data.draft);
@@ -12,20 +14,74 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await render(post);
-const fmtLong = (d) => d.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+const el = bySlug(post.data.elements[0]);
+const fmtLong = (d) => d.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+
+// 固定種子的稀疏星點，只鋪在兩側留白，不干擾閱讀
+let seed = 11;
+const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+const stars = Array.from({ length: 46 }, () => {
+  const side = rnd() < 0.5;
+  return { x: side ? rnd() * 22 : 78 + rnd() * 22, y: rnd() * 100, r: 0.4 + rnd() * 0.9, o: 0.12 + rnd() * 0.3 };
+});
 ---
-<Base title={`${post.data.title} — Alvin`} description={post.data.summary}>
-  <article class="article">
-    <a class="backlink" href="/writing"><span class="arr">&#8592;</span> All writing</a>
-    <div class="article-head">
+<Base title={`${post.data.title} · Alvin`} description={post.data.summary} bare>
+  <div class="reader" style={`--el:${el.color}`}>
+    <svg class="r-stars" aria-hidden="true" preserveAspectRatio="none" viewBox="0 0 100 100">
+      {stars.map((s) => <circle cx={s.x.toFixed(2)} cy={s.y.toFixed(2)} r={(s.r / 6).toFixed(3)} opacity={s.o.toFixed(2)} />)}
+    </svg>
+
+    <header class="r-top">
+      <a class="r-mark" href="/">Alvin</a>
+      <a class="r-back" href={`/?el=${el.slug}`}><span aria-hidden="true">&#8592;</span> 星盤 · {el.zh}</a>
+    </header>
+
+    <article class="r-article" lang={post.data.lang === 'en' ? 'en' : 'zh-Hant'}>
+      <p class="r-el"><span class="r-zh">{el.zh}</span> {el.domain}</p>
       <h1>{post.data.title}</h1>
-      <p class="meta">{fmtLong(post.data.date)}</p>
-    </div>
-    <div class="article-body">
-      {post.data.summary && post.data.externalUrl && <p>{post.data.summary}</p>}
-      <Content />
-      {post.data.externalUrl && <p><a class="inline" href={post.data.externalUrl} target="_blank" rel="noopener">閱讀原文 &#8599;</a></p>}
-    </div>
-    <a class="backlink" href="/writing"><span class="arr">&#8592;</span> All writing</a>
-  </article>
+      <p class="r-meta">{fmtLong(post.data.date)}</p>
+      <div class="r-body">
+        {post.data.summary && post.data.externalUrl && <p>{post.data.summary}</p>}
+        <Content />
+        {post.data.externalUrl && <p><a href={post.data.externalUrl} target="_blank" rel="noopener">閱讀原文 &#8599;</a></p>}
+      </div>
+      <a class="r-back r-foot" href={`/?el=${el.slug}`}><span aria-hidden="true">&#8592;</span> 回到星盤</a>
+    </article>
+  </div>
 </Base>
+
+<style is:global>
+  /* 和首頁（暖灰夜色）區隔：更深、偏藍的夜空，元素色只當點綴 */
+  .reader {
+    --bg: #0e1117; --ink: #dcdfe5; --dim: #8b93a1; --rule: rgba(220, 223, 229, .12);
+    --serif: "Songti TC", "Noto Serif TC", "Source Han Serif TC", "PMingLiU", serif;
+    position: relative; min-height: 100vh; background: var(--bg); color: var(--ink);
+  }
+  html:has(.reader), body:has(.reader) { background: #0e1117; }
+  .r-stars { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .r-stars circle { fill: var(--ink); }
+  .r-top { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: baseline; padding: 26px 32px; }
+  .r-mark { font-weight: 700; font-size: 19px; letter-spacing: -0.02em; }
+  .r-back { font-size: 14px; color: var(--dim); }
+  .r-back:hover, .r-back:focus-visible { color: var(--ink); }
+  .r-article { position: relative; z-index: 1; max-width: 36em; margin: 0 auto; padding: 48px 24px 96px; }
+  .r-el { margin: 0 0 18px; font-size: 13px; letter-spacing: .06em; color: var(--dim); }
+  .r-zh { font-family: var(--serif); font-weight: 700; font-size: 18px; color: var(--el); margin-right: 4px; }
+  .r-article h1 { margin: 0; font-family: var(--serif); font-size: clamp(26px, 4.4vw, 40px); line-height: 1.35; font-weight: 700; letter-spacing: 0; }
+  .r-meta { margin: 18px 0 0; padding-bottom: 32px; border-bottom: 1px solid var(--rule); font-size: 13px; color: var(--dim); letter-spacing: .04em; }
+  .r-body { margin-top: 36px; font-size: 18px; line-height: 1.95; }
+  .r-body p { margin: 0 0 1.4em; }
+  .r-body h2 { font-family: var(--serif); font-size: 24px; margin: 2.2em 0 .8em; }
+  .r-body h3 { font-size: 19px; margin: 1.8em 0 .6em; }
+  .r-body a { color: var(--ink); border-bottom: 1px solid var(--el); }
+  .r-body a:hover { color: var(--el); }
+  .r-body blockquote { margin: 0 0 1.4em; padding-left: 1em; border-left: 2px solid var(--el); color: var(--dim); }
+  .r-body img { max-width: 100%; height: auto; }
+  .r-body hr { border: 0; border-top: 1px solid var(--rule); margin: 2.4em 0; }
+  .r-body code { font-size: .9em; background: rgba(220, 223, 229, .08); padding: .1em .35em; border-radius: 3px; }
+  .r-body pre { overflow-x: auto; background: rgba(220, 223, 229, .06); padding: 16px; border-radius: 4px; }
+  .r-body pre code { background: none; padding: 0; }
+  .r-foot { display: inline-block; margin-top: 24px; }
+  .reader a:focus-visible { outline: 1px dashed var(--ink); outline-offset: 4px; }
+  @media (max-width: 767px) { .r-top { padding: 22px 24px; } .r-body { font-size: 17px; } }
+</style>

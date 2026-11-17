@@ -2,6 +2,6 @@
   { "slug": "wood",  "zh": "木", "en": "building", "domain": "Building / workflow", "tagline": "Connecting the dots", "color": "#7fa88b" },
   { "slug": "fire",  "zh": "火", "en": "sports",   "domain": "Sports / pickleball", "tagline": "Burn, and enjoy it", "color": "#c8553d" },
   { "slug": "earth", "zh": "土", "en": "wellness", "domain": "Wellness / training", "tagline": "Sound mind, solid form", "color": "#c9a15a" },
-  { "slug": "metal", "zh": "金", "en": "ai",       "domain": "AI / technology",     "tagline": "Keep up with the trend, explore new opportunities", "color": "#d4d6d9" },
+  { "slug": "metal", "zh": "金", "en": "ai",       "domain": "AI / Tech",           "tagline": "Keep up with the trend, explore new opportunities", "color": "#d4d6d9" },
   { "slug": "water", "zh": "水", "en": "esoteric", "domain": "玄學",                 "tagline": "Be liquid and well prepared", "color": "#5f84a8" }
 ]

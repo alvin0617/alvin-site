@@ -4,7 +4,7 @@ import Lists from '../../components/Lists.astro';
 import { ELEMENTS, loadAll } from '../../lib/content';
 const { writing } = await loadAll();
 ---
-<Base title="Writing — Alvin" description="Alvin 的全部文章，依五行領域分類。">
+<Base title="Writing · Alvin" description="Alvin 的全部文章，依五行領域分類。">
   <div class="page-head">
     <h1>Writing<span class="stop">.</span></h1>
     <p class="el-links">{ELEMENTS.map((e) => <a href={`/${e.slug}#writing`}>{e.zh} {e.domain}</a>)}</p>
