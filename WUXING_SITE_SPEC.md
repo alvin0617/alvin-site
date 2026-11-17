@@ -36,7 +36,7 @@ Alvin 的五個領域剛好對應五行，而命理、玄學本來就是他的�
 | 金 | 趨勢、新機會 | AI／technology（知識與寫作）| `metal` |
 
 **相生順序**：木 → 火 → 土 → 金 → 水 → 木。
-Alvin 已確認對應（2026-11-17，火與金對調）。五句短語：木 Connecting the dots／火 Burn, and enjoy it／土 好的精神與狀態／金 Keep up with the trend, explore new opportunities／水 Be liquid and well prepared。
+Alvin 已確認對應（2026-11-17，火與金對調）。五句短語：木 Connecting the dots／火 Burn, and enjoy it／土 Sound mind, solid form／金 Keep up with the trend, explore new opportunities／水 Be liquid and well prepared。
 
 > 【需 Alvin 確認】五個領域與五行的對應。如果他想調整（例如金對應 AI），只需改資料檔，不影響程式。
 
